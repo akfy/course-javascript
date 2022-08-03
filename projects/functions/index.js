@@ -19,7 +19,7 @@ function returnArgumentsArray() {
 }
 
 function bindFunction(fn, ...args) {
-  return () => fn(...args);
+  return fn.bind(this, ...args);
 }
 
 export {
