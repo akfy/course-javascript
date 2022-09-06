@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="some-class-1"><b>привет!</b> <b class="some-class-1 some-class-2">loftschool</b></div>
+</body>
+<script>
+    function collectDOMStat(root) {
+        const result = {
+            tags: {},
+            classes: {},
+            texts: 0,
+        };
+
+        function stat(root) {
+            
+            for (const child of root.childNodes) {
+              
+                if (child.nodeType === Node.TEXT_NODE) {
+                    result.texts++;
+                } else if (child.nodeType === Node.ELEMENT_NODE) {
+                    if (child.tagName in result.tags) {
+                        result.tags[child.tagName]++;
+                    } else {
+                        result.tags[child.tagName] = 1;
+                    }
+
+                    for (const className of child.classList) {
+                        if (className in result.classes) {
+                            result.classes[className]++;
+                        } else {
+                            result.classes[className] = 1;
+                        }
+                    }
+
+                    stat(child);
+                }
+            }
+        }
+
+        stat(root);
+        return result;
+    }
+    console.log(collectDOMStat(document.body));
+</script>
+
+</html>
