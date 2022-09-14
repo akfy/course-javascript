@@ -45,8 +45,73 @@ const addButton = homeworkContainer.querySelector('#add-button');
 // таблица со списком cookie
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
+updateTable(filterNameInput.value);
+
+function parseCookies() {
+  return document.cookie.split('; ').reduce((prev, current) => {
+    const [name, value] = current.split('=');
+    prev[name] = value;
+    return prev;
+  }, {});
+}
+
+function isMatching(full, chunk) {
+  return full.toLowerCase().includes(chunk.toLowerCase());
+}
+
+function addListItem(itemName, itemValue) {
+  const listItem = document.createElement('TR');
+  const name = document.createElement('TH');
+  name.textContent = itemName;
+  const value = document.createElement('TH');
+  value.textContent = itemValue;
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = 'Удалить';
+  listItem.appendChild(name);
+  listItem.appendChild(value);
+  listItem.appendChild(deleteBtn);
+  listTable.appendChild(listItem);
+}
+
+function updateTable(filterValue) {
+  const cookies = parseCookies();
+  while (listTable.firstChild) {
+    listTable.removeChild(listTable.firstChild);
+  }
+
+  for (const prop in cookies) {
+    // if (cookies[prop]) {
+    if (filterValue) {
+      if (isMatching(prop, filterValue) || isMatching(cookies[prop], filterValue)) {
+        addListItem(prop, cookies[prop]);
+      }
+    } else {
+      addListItem(prop, cookies[prop]);
+    }
+  }
+  // }
+}
+
 filterNameInput.addEventListener('input', function () {});
 
-addButton.addEventListener('click', () => {});
+addButton.addEventListener('click', () => {
+  document.cookie = `${addNameInput.value}=${addValueInput.value}`;
+  addNameInput.value = '';
+  addValueInput.value = '';
+  updateTable(filterNameInput.value);
+});
 
-listTable.addEventListener('click', (e) => {});
+listTable.addEventListener('click', (e) => {
+  if (e.target.tagName === 'BUTTON') {
+    deleteCookie(e.target.parentElement.firstChild.textContent);
+    e.target.parentElement.remove();
+  }
+});
+
+filterNameInput.addEventListener('input', function () {
+  updateTable(filterNameInput.value);
+});
+
+function deleteCookie(name) {
+  document.cookie = name + '=; Max-Age=-99999999;';
+}
